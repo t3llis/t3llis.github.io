@@ -24,7 +24,7 @@ author:
         github:  "t3llis/"
         linkedin: "charis-stamatellis"
 # Build settings
-theme: dinky
+theme: minima
 plugins:
   - jekyll-feed
 
