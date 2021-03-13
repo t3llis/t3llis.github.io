@@ -11,7 +11,7 @@ locale: "en-US"
 title: t3llis
 title_separator: "-"
 name: "Charis Stamatellis"
-description: "Offensice Security Blog"
+description: "Offensive Security Blog"
 url: "https://t3llis.github.io"
 repository: "t3llis/t3llis.github.io"
 words_per_minute: 200
