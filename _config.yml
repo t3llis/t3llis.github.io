@@ -18,9 +18,11 @@ words_per_minute: 200
 
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
-#twitter_username: jekyllrb
-github:  "t3llis"
-linkedin: "charis-stamatellis"
+#twitter_username: jekyllrbA
+author:
+        name: "Charis Stamatellis"
+        github:  "t3llis/"
+        linkedin: "charis-stamatellis"
 # Build settings
 theme: minima
 plugins:
