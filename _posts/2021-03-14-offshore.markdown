@@ -9,9 +9,7 @@ Hi everyone, this is my first post regarding my experience with ProLab Offshore 
 
 This post is going to cover my learning experiences and present my persective towards dealing with Offshore lab. There won't be any spoilers as it is clearly against the rules and it ruins the overall experience.
 
-Many thanks to [last](https://twitter.com/last0x00) for the following blog post about Offshore, which helped me to establish a solid C2 infrastructure and complete my lab setup:
-
-https://blog.notso.pro/2019-10-24-tactical-debriefing1/
+Many thanks to [last](https://twitter.com/last0x00) for the detailed blog [post](https://blog.notso.pro/2019-10-24-tactical-debriefing1/) about Offshore, which helped me to establish a solid C2 infrastructure and complete my lab setup:
 
 # Introduction
 
