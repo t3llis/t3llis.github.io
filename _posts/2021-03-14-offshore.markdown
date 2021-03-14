@@ -4,7 +4,16 @@ title:  "HackTheBox - Offshore Review"
 date:   2021-03-12 12:52:57 +0200
 categories: jekyll update
 ---
-My first post.
+
+Hi everyone, this is my first post regarding my experience with ProLab Offshore by HackTheBox. I decided to take advantage of that nice 50% discount on the setup fees of the lab, provided by HTB during Christmas time of 2020 and start Offshore as I thought that it would be the most suitable choice, based on my technical knowledge and Active Directory background.
+
+This post is going to cover my learning experiences and present my persective towards dealing with Offshore lab. There won't be any spoilers as it is clearly against the rules and it ruins the overall experience.
+
+Many thanks to [last](https://twitter.com/last0x00) for the following blog post about Offshore, which helped me to establish a solid C2 infrastructure and complete my lab setup:
+
+https://blog.notso.pro/2019-10-24-tactical-debriefing1/
+
+# Introduction
 
 [jekyll-docs]: https://jekyllrb.com/docs/home
 [jekyll-gh]:   https://github.com/jekyll/jekyll
