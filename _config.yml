@@ -8,9 +8,8 @@
 # For technical reasons, this file is *NOT* reloaded automatically when you use
 # 'bundle exec jekyll serve'. If you change this file, please restart the server process.
 locale: "en-US"
-#title: t3llis
+title: t3llis
 title_separator: "-"
-name: "Charis Stamatellis"
 description: "Offensive Security Blog"
 words_per_minute: 200
 
