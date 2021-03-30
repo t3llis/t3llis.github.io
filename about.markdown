@@ -3,7 +3,7 @@ layout: page
 title: About
 permalink: /about.html
 ---
-My name is Charis and I am a current Red Teamer and Penetration Tester.
+My name is Charis [kʰáris] and I am a current Red Teamer and Penetration Tester.
 
 I am focused on Red Team operations and Network Penetration Testing as well as Web Application Security while i enjoy making things OPSEC.
 

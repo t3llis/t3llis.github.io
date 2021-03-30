@@ -1,0 +1,107 @@
+---
+layout: post
+title:  "HackTheBox - Offshore Review"
+date:   2021-03-30 12:52:57 +0200
+permalink: /posts/offshore.html
+categories: jekyll update
+---
+
+Hi everyone, this is my first post regarding my experience with ProLab Offshore by HackTheBox. I decided to take advantage of that nice 50% discount on the setup fees of the lab, provided by HTB during Christmas time of 2020 and start Offshore as I thought that it would be the most suitable choice, based on my technical knowledge and Active Directory background.
+
+This post is going to cover my learning experiences and present my perspective towards dealing with Offshore lab. There won't be any spoilers as it is clearly against the rules and it ruins the overall experience.
+
+Many thanks to [last](https://twitter.com/last0x00) for the detailed blog [post](https://blog.notso.pro/2019-10-24-tactical-debriefing1/) about Offshore, which helped me to establish a solid C2 infrastructure and complete my lab setup:
+
+# Introduction
+
+To begin with, the current topology of the lab includes 21 machines, of which only the firewall machine is out of scope. There are 38 flags as we speak and a list of these flags and machines can be observed below:
+
+![HTB list](../images/list.png)
+ 
+Your goal it to compromise one of the DMZ machines, located in the 10.10.110.0/24 subnet, and then move laterally through various domains until you have compromised all of the targets and captured all flags! I can not provide a lot of information about the domain trusts but I would say that firewall rules limit movement between each domain and thus a suitable C2 framework is recommended in order to make things easier.
+
+Before I dive into explaining my C2 of choice, I would like to emphasize some key aspects of Offshore ProLab that make it a valuable Active Directory Attack Lab. In particular, there is a main attack path that requires a meticulous AD enumeration methodology in order to identify and exploit misconfigurations, escalate your privileges and ultimately own the various domains. Moreover, a CTF sidequest mentioned in older Offshore review has been removed, although some flags need out-of-the-box thinking in order to be retrieved.
+
+To sum up, I would say that this lab serves as an excellent Active Directory dojo, which will enhance your knowledge in:
+
+* __AD & Kerberos Abuse__
+* __AD Enumeration__
+* __Lateral Movement__
+* __Exfiltration__
+* __Privilege Escalation__
+
+In some cases, a proper obfuscation of payloads/commands in order to evade Windows Defender is needed, although it acts more as an introduction to the Defense Evasion methodology, rather than as one of Offshore's main objectives. There are great public resources available about these topics such as [spotheplanet](https://twitter.com/spotheplanet)'s [blog](https://www.ired.team/) or [harmj0y](http://www.harmj0y.net/blog/) and his great [work](http://www.harmj0y.net/blog/). Nevertheless, I would suggest that you do your own research.
+
+
+# C2 Framework
+
+Having explained some key aspects of the lab environment, the next step includes justifying my Command and Control (C2) Framework of choice that I used during my operational engagement. In particular, I chose [PoshC2](https://github.com/Nettitude/PoshC2), an open-source C2 Framework, after experimenting with some available open-source C2s. I am not going to elaborate on the architecture of a modern C2, as that concept has already been analyzed by [last](https://blog.notso.pro/2019-10-24-tactical-debriefing1/) but I would like to point out some notable features of PoshC2 that make it a suitable choice for establishing a trustworthy Red Team infrastructure:
+
+* Highly configurable generated payloads which are frequently updated
+* In-build AMSI bypass and ETW patching techniques within PoshC2 shellcode
+* Open-source SOCKS Proxy using [SharpSocks](https://github.com/nettitude/SharpSocks)
+* HTTP(S) and SMB implants for Daisy-chaining
+
+Although a graphical UI, has not been implemented in the PoshC2 project, installation and usage is quite straightforward. It should be noted that all commands and relevant output is saved in log files and also visible with a built-in command. Nevertheless, the key advantage of PoshC2 which simplifies the process of pivoting from one domain to another in Offshore, is the SOCKS Proxy functionality which eliminates the burdensome need of manually getting an interactive session (i.e. RDP connection) to a compromised machine, and then using any pivoting technique/software.
+
+# PoshC2 and Pivoting 101
+
+As soon as you have installed PoshC2 by either installing it directly on your host machine or using Docker, setting up a new project and listener is handled by the **posh-project** command as follows:
+
+- __posh-project -n \<project-name>__ (create new project)
+- __posh-project -s \<project-to-switch-to>__ (in case of multiple projects)
+
+Then use the following commands to finish the utilization of the PoshC2 project:
+
+- __posh-config__ (edit the configuration for your project)
+- __posh-server__ (launch the server)
+- __posh -u \<username>__ (interact with the PoshC2 server)
+
+A screenshot of the PoshC2 configuration can be seen below:
+
+![posh-config](../images/poshconfig.png)
+
+The [documentation](https://poshc2.readthedocs.io/en/latest/index.html) of PoshC2 is actively maintained and there are great public resources such as this [series](https://zer0metasec.com/old/post-oscp-series-part-1/) of posts. As a result, I will focus on describing my "tactical" methodology with PoshC2 on how to run a smooth post-exploitation campaign on Offshore.
+
+To begin with, we assume that initial compromise to a DMZ machine has been achieved while it should be noted that in this stage we can either use a short-term reverse shell of a PoshC2 implant to establish persistency for our pivoting point. Since the attacker can only access the DMZ zone, a pivoting technique must be utilized in order to move laterally to the rest of the domains. [This](https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Network%20Pivoting%20Techniques.md) git repo contains the majority of common pivoting techniques available, but I am going to briefly present the ones that make things simple in Offshore ProLabs.
+
+Although it is not mandatory, if you decide to use a DMZ machine as a redirector to disguise web traffic and take advantage of PoshC2 proxy-aware functionality, then I suggest that you use a Linux machine from the DMZ and set up a remote ssh port forwarding as follows: 
+
+* __ssh -R \<ssh-server-ip>:\<ssh-server-port>:\<C2-ip>:\<C2-port> user@ssh-server__
+
+Using the command above, you "instruct" the SSH service to forward traffic of the specified remote SSH IP/port to our local C2 IP/port. Also, once you run the *posh-config* command, don't forget to set the **PayloadCommsHost** option to the IP/Port of the SSH server.
+
+It should also be mentioned that the "**GatewayPorts clientspecified**" directive should be added to the **/etc/ssh/sshd\_config** file in order for any non-local IP to be accessible (root privileges required) and then restart the SSH server.
+
+
+
+Moreover, you still need some way to access the non-DMZ subnets. My tool of choice is [sshuttle](https://github.com/sshuttle/sshuttle) in order to create a stable proxy connection over ssh using public key authentication ,as follows:
+
+* __sshuttle -vvr user@ssh-server-ip network/netmask -e 'ssh -i /path/to/private_key'__
+
+It should be noted that you don't have to be root to run sshuttle, while the network performance is quite satisfactory. So here's an example of how our setup would look like if we had remote port forwarded our PoshC2 server's traffic through a compromised DMZ machine and at the same time use sshuttle to access the internal infrastructure:
+
+![infrastructure](../images/infra.png)
+
+In this phase, you have set up properly your pivoting machine and have optionally used a web redirector between your C2 server and target machine. Assuming you have identified your next target and the relevant attack vector, delivering your PoshC2 implant and getting command execution should not be big trouble. However, in case you need to bypass Microsoft Defender Antivirus, I would suggest you do one of the following:
+
+1. __Disable Real-Time Protection__: A non-OPSEC but effective solution is to disable RTP with the *Set-MpPreference -DisableRealtimeMonitoring $true* Powershell command. This action assumes that you have Administrative access somehow to the target machine.
+2. __Bypass AV by delivering an obfuscated PoshC2 implant__: I suggest you take a look on [phra](https://twitter.com/phraaaaaaa/)'s [PEzor](https://github.com/phra/PEzor) and experiment on how to evade Microsoft's Antivirus. It was definitely a great learning experience.
+
+Lastly, it is not my intention to spoil the fun by providing a complete PoshC2 cheat sheet, but I am going to drop a few tips that are worth mentioning:
+
+* Use the *searchhelp <command>* command to get help for commands available in each PoshC2 implant
+* Take advantage of the auto-completion feature of PoshC2 in order to minimize typos
+* Take advantage of the auto-suggestion feature of PoshC2, where each prompt maintains a contextual command history in order to minimize typos and maximize efficiency
+* Utilize the SOCKS Proxy feature from a **Powershell** implant by running the *sharpsocks* command. A command will be provided to the user to run on the C2 Server that will eventually start the SOCKS server. Take a note on the command output and edit appropriately the __/etc/proxychains.conf__ file in order to tunnel traffic with proxychains on Linux.
+ 
+# Conclusions
+
+To sum up, I would like to thank the HTB team for designing and actively maintaining the Offshore ProLab as I believe that it is a realistic Active Directory lab where each player can definitely practice the various techniques mentioned in the introductory section. I totally recommend this ProLab as it is a realistic and highly educative AD environment. Moreover, I would like to thank each and every one of the infosec buddies I've met in the private Offshore channel of NetSecFocus Mattermost, for their valuable feedback and help.
+
+My goal was to provide a short guide on how PoshC2 can be used in the Offshore context, without making spoilers about the lab or providing a cheat sheet about PoshC2. I hoped that these guidelines were both useful and not too generic. Please feel free to contact me if you have any questions or concerns. I'm planning on doing the Cybernetics ProLab sometime soon, so stay tuned for my next review.
+
+
+[jekyll-docs]: https://jekyllrb.com/docs/home
+[jekyll-gh]:   https://github.com/jekyll/jekyll
+[jekyll-talk]: https://talk.jekyllrb.com/
