@@ -17,13 +17,9 @@ words_per_minute: 200
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
 # Site Author
-author:
-  name             : "Charis-Stamatellis"
-  #  avatar           : "images/"
-  bio              : "I like to run things OPSEC"
-  location         : "Greece"
-  github           : "t3llis/"
-  linkedin         : "charis-stamatellis"
+github_username:  t3llis
+linkedin_username: charis-stamatellis
+
 theme: minima
 plugins:
   - jekyll-feed
