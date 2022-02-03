@@ -15,8 +15,6 @@ words_per_minute: 200
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "https://t3llis.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 # Site Author
-github_username:  t3llis
-linkedin_username: charis-stamatellis
 theme: minima
 plugins:
         - jekyll-feed
